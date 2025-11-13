@@ -136,7 +136,7 @@ async function run() {
     // PATCH — Mark Habit as Complete (push today's date)
     app.patch("/habits/:id/complete", async (req, res) => {
       const id = req.params.id;
-      const today = new Date().toISOString().split("T")[0]; // e.g. "2025-11-10"
+      const today = new Date().toISOString().split("T")[0];
 
       try {
         const habit = await habitCollection.findOne({ _id: new ObjectId(id) });
