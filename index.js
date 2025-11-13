@@ -22,7 +22,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
 
     // Database & Collection
     const habitCollection = client.db("habitDB").collection("habits");
@@ -172,7 +172,7 @@ async function run() {
     });
 
     // Test DB connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Connected to MongoDB and CRUD routes are live!");
   } finally {
     // await client.close();
