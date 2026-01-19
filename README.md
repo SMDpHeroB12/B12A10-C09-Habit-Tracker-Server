@@ -5,6 +5,12 @@ This server supports full **CRUD operations**, **public habit sharing**, and **h
 
 ---
 
+## GitHub Client Repository (Client)
+
+https://github.com/SMDpHeroB12/B12A10-C09-Habit-Tracker-Client
+
+---
+
 ## 🚀 Features
 
 - ✅ **Create** new habits
@@ -40,6 +46,14 @@ This server supports full **CRUD operations**, **public habit sharing**, and **h
 | **PUT**    | `/habits/:id`          | Update an existing habit               |
 | **DELETE** | `/habits/:id`          | Delete a habit                         |
 | **PATCH**  | `/habits/:id/complete` | Mark a habit as complete               |
+
+---
+
+## 🧩 Deployment
+
+- **Client Side:** Firebase Hosting : [https://habit-tracker-b12a10c09.web.app/](https://habit-tracker-b12a10c09.web.app/)
+- **Server Side:** Vercel : [https://habit-tracker-server-iota.vercel.app/](https://habit-tracker-server-iota.vercel.app/)
+- **Database:** MongoDB Atlas
 
 ---
 
