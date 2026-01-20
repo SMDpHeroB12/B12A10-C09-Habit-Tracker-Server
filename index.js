@@ -20,6 +20,30 @@ const client = new MongoClient(uri, {
   },
 });
 
+// --- helpers ---
+const normalizeImages = (habit) => {
+  // Accept either: images: [] or image: ""
+  const imagesFromArray = Array.isArray(habit?.images) ? habit.images : [];
+  const imagesFromSingle =
+    typeof habit?.image === "string" && habit.image.trim()
+      ? [habit.image.trim()]
+      : [];
+
+  // Merge + remove empties + de-duplicate
+  const merged = [...imagesFromArray, ...imagesFromSingle]
+    .map((x) => (typeof x === "string" ? x.trim() : ""))
+    .filter(Boolean);
+
+  const unique = [...new Set(merged)];
+
+  // Keep both:
+  // - images[] for slider
+  // - image for old UI / lists (use first image)
+  habit.images = unique;
+  habit.image = unique[0] || habit.image || "";
+
+  return habit;
+};
 async function run() {
   try {
     // await client.connect();
@@ -30,9 +54,18 @@ async function run() {
     // CREATE — Add new habit
     app.post("/habits", async (req, res) => {
       const habit = req.body;
-      habit.createdAt = new Date();
 
       try {
+        // createdAt timestamp
+        habit.createdAt = new Date();
+
+        // Normalize images
+        normalizeImages(habit);
+
+        // Ensure completionHistory is an array
+        if (!Array.isArray(habit.completionHistory))
+          habit.completionHistory = [];
+
         const result = await habitCollection.insertOne(habit);
 
         if (result.insertedId) {
@@ -89,6 +122,16 @@ async function run() {
       const id = req.params.id;
       try {
         const habit = await habitCollection.findOne({ _id: new ObjectId(id) });
+
+        if (!habit) {
+          return res
+            .status(404)
+            .send({ success: false, message: "Habit not found" });
+        }
+
+        // Normalize Existing docs that might have image, not images[]
+        normalizeImages(habit);
+
         res.send({ success: true, habit });
       } catch (error) {
         console.error(error);
@@ -104,9 +147,12 @@ async function run() {
       const updatedHabit = req.body;
 
       try {
+        // Normalize images on update too
+        normalizeImages(updatedHabit);
+
         const result = await habitCollection.updateOne(
           { _id: new ObjectId(id) },
-          { $set: updatedHabit }
+          { $set: updatedHabit },
         );
         res.send({ success: true, result });
       } catch (error) {
@@ -159,7 +205,7 @@ async function run() {
         // Push today's date into completionHistory array
         const result = await habitCollection.updateOne(
           { _id: new ObjectId(id) },
-          { $push: { completionHistory: today } }
+          { $push: { completionHistory: today } },
         );
 
         res.send({ success: true, message: "Habit marked complete!", result });
